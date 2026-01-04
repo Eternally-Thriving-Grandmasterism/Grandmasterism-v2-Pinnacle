@@ -1,0 +1,6 @@
+git clone https://github.com/Eternally-Thriving-Grandmasterism/Grandmasterism-v2-Pinnacle.git
+cd Grandmasterism-v2-Pinnacle
+# Create files/folders via copy-paste below (exact paths, one block per major file)
+git add .
+git commit -m "Initial quantum mastery pinnacle: v2 eternal strategy + chess engine"
+git push origin main
