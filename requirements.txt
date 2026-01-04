@@ -1,0 +1,4 @@
+```text
+chess>=1.10.0
+qutip>=4.7.0
+numpy>=1.21.0
