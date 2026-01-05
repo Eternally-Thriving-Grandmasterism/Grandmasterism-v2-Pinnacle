@@ -9,7 +9,7 @@ import chess.engine
 class LeelaChessZero:
     def __init__(self, path: str = "lc0"):
         self.engine = chess.engine.SimpleEngine.popen_uci(path)
-        self.engine.configure({"Threads": 4, "NNCacheSize": 200000})  # Configurable
+        self.engine.configure({"Threads": 4, "NNCacheSize": 200000})  # Configurable neural power
 
     def evaluate_position(self, fen: str = chess.STARTING_FEN, nodes: int = 10000) -> dict:
         board = chess.Board(fen)
@@ -20,13 +20,21 @@ class LeelaChessZero:
             "fen": fen,
             "score_cp": score,
             "best_move": board.san(best_move) if best_move else "None",
-            "neural_insight": "Leela thriving path — intuitive harmony eternal"
+            "neural_insight": "Leela thriving path — intuitive neural harmony eternal"
         }
+
+    def play_variant(self, variant: str = "standard", moves: list = []) -> dict:
+        if variant == "crazyhouse":
+            board = chess.variant.CrazyhouseBoard()
+        else:
+            board = chess.Board()
+        for move in moves:
+            board.push_uci(move)
+        return self.evaluate_position(board.fen())
 
     def quit(self):
         self.engine.quit()
 
-# Demo
 if __name__ == "__main__":
     leela = LeelaChessZero()
     print(leela.evaluate_position())
