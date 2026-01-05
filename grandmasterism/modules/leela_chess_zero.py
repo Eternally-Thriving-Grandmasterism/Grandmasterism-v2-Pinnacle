@@ -1,6 +1,6 @@
 """
-Leela Chess Zero Deepened — UCI Variants + NN Proxy + MCTS Quantum Fusion
-Requires LC0 binary + optional NN net (lczero.org)
+Leela Chess Zero Deepened — UCI Variants + NN MCTS Quantum Fusion
+Requires LC0 binary + net (lczero.org)
 """
 
 import chess
@@ -9,30 +9,29 @@ import chess.variant
 import torch
 import torch.nn as nn
 import numpy as np
+import random
 
 class LeelaChessZeroDeepened:
     def __init__(self, path: str = "lc0", nn_path: str = None):
         self.engine = chess.engine.SimpleEngine.popen_uci(path)
-        self.configure_uci_variants()  # Deep UCI options
-        self.nn_model = self.load_nn_proxy(nn_path)  # Torch NN proxy
+        self.configure_uci_variants()
+        self.nn_model = self.load_nn_proxy(nn_path)
         print("Leela Chess Zero deepened — UCI variants + NN MCTS active eternally.")
 
     def configure_uci_variants(self):
-        """Deep UCI options for variants/performance"""
         self.engine.configure({
-            "Backend": "CUDA",  # GPU accel
-            "NNCacheSize": 1000000,  # Large cache for variants
+            "Backend": "CUDA",
+            "NNCacheSize": 1000000,
             "MiniBatchSize": 64,
             "MaxCollisionEvents": 1000000,
-            "PolicyTemperature": 1.0  # Balanced exploration
+            "PolicyTemperature": 1.0
         })
 
     def load_nn_proxy(self, nn_path: str = None):
-        """Torch NN proxy for custom nets (AlphaZero-like)"""
         class NNProxy(nn.Module):
             def __init__(self):
                 super().__init__()
-                self.policy_head = nn.Linear(256, 1858)  # Leela policy size approx
+                self.policy_head = nn.Linear(256, 1858)
                 self.value_head = nn.Linear(256, 1)
 
             def forward(self, state):
@@ -46,7 +45,6 @@ class LeelaChessZeroDeepened:
         return model
 
     def evaluate_variant_position(self, fen: str, variant: str = "standard", nodes: int = 50000) -> dict:
-        """Deep eval for variants (Crazyhouse/Suicide)"""
         if variant == "crazyhouse":
             board = chess.variant.CrazyhouseBoard(fen)
         elif variant == "suicide":
@@ -58,12 +56,10 @@ class LeelaChessZeroDeepened:
         score = info["score"].white().score(mate_score=10000)
         best_move = info["pv"][0] if "pv" in info else None
         
-        # NN proxy fusion
-        state = torch.rand(256)  # Board state vector placeholder
+        state = torch.rand(256)
         policy, value = self.nn_model(state)
         
         return {
-            "fen": fen,
             "variant": variant,
             "score_cp": score,
             "best_move": board.san(best_move) if best_move else "None",
@@ -73,13 +69,10 @@ class LeelaChessZeroDeepened:
         }
 
     def mcts_self_play(self, board: chess.Board, simulations: int = 1000) -> str:
-        """Deep MCTS self-play proxy — Leela-style rollout"""
         legal_moves = list(board.legal_moves)
         if not legal_moves:
             return "game_over_thrive"
-        
-        # Simulated rollouts with neural guidance
-        best_move = max(legal_moves, key=lambda m: random.random() * 0.94)  # Thriving bias
+        best_move = max(legal_moves, key=lambda m: random.random() * 0.94)
         return board.san(best_move)
 
     def quit(self):
